@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Emmanuel Zúñiga — Integrations & Cloud Engineer</title>
+<meta name="description" content="Emmanuel Zúñiga Castro — Cloud Identity Support Engineer and Integrations Specialist. Live demonstration of REST API integration, cloud, and front-end engineering." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --ink:#0F4761;        /* resume teal — brand thread */
+    --ink-deep:#0B2A3A;
+    --deep:#0B1F2A;       /* console near-black teal */
+    --deep-2:#102A38;
+    --paper:#EEF2F5;      /* cool light page bg (not cream) */
+    --surface:#FFFFFF;
+    --accent:#1FC9A0;     /* "200 OK" terminal teal-green */
+    --accent-dim:#0E8a6c;
+    --signal:#E6B450;     /* GET / method amber */
+    --danger:#E5645B;
+    --wire:#D7E0E6;
+    --muted:#5C6F7A;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --disp:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,sans-serif;
+    --maxw:1080px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--paper);color:var(--ink-deep);
+    font-family:var(--body);font-size:16px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(238,242,245,.82);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--wire);
+  }
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:62px;}
+  .brand{font-family:var(--mono);font-weight:700;font-size:15px;color:var(--ink);letter-spacing:-.02em;}
+  .brand span{color:var(--accent-dim);}
+  .nav-links{display:flex;gap:26px;align-items:center;}
+  .nav-links a{font-size:14px;color:var(--muted);font-weight:500;transition:color .18s;}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-cv{
+    font-family:var(--mono);font-size:13px;font-weight:500;
+    color:var(--ink);border:1px solid var(--ink);border-radius:7px;
+    padding:7px 13px;transition:all .18s;
+  }
+  .nav-cv:hover{background:var(--ink);color:#fff;}
+  @media(max-width:720px){.nav-links a:not(.nav-cv){display:none;}}
+
+  /* ---------- hero ---------- */
+  header{padding:74px 0 30px;}
+  .eyebrow{
+    font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent-dim);margin-bottom:20px;display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--accent-dim);}
+  h1{
+    font-family:var(--disp);font-weight:700;letter-spacing:-.03em;line-height:1.04;
+    font-size:clamp(36px,6vw,62px);margin:0 0 22px;color:var(--ink-deep);max-width:16ch;
+  }
+  h1 em{font-style:normal;color:var(--ink);position:relative;}
+  h1 em::after{content:"";position:absolute;left:0;right:0;bottom:6px;height:10px;background:var(--accent);opacity:.28;z-index:-1;}
+  .lede{font-size:clamp(17px,2.1vw,20px);color:var(--muted);max-width:58ch;margin:0 0 30px;}
+  .lede b{color:var(--ink-deep);font-weight:600;}
+  .cta-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;}
+  .btn{
+    font-family:var(--mono);font-size:14px;font-weight:500;
+    padding:13px 20px;border-radius:9px;transition:transform .16s,box-shadow .16s,background .16s;
+    display:inline-flex;align-items:center;gap:9px;cursor:pointer;border:1px solid transparent;
+  }
+  .btn-primary{background:var(--ink);color:#fff;}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 26px -12px var(--ink);}
+  .btn-ghost{border-color:var(--wire);color:var(--ink-deep);background:var(--surface);}
+  .btn-ghost:hover{border-color:var(--ink);transform:translateY(-2px);}
+  .meta-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:34px;}
+  .chip{
+    font-family:var(--mono);font-size:12px;color:var(--muted);
+    background:var(--surface);border:1px solid var(--wire);border-radius:999px;padding:6px 13px;
+  }
+  .chip b{color:var(--ink);font-weight:600;}
+
+  /* ---------- section scaffold ---------- */
+  section{padding:56px 0;}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:30px;}
+  .sec-num{font-family:var(--mono);font-size:13px;color:var(--accent-dim);font-weight:500;}
+  .sec-title{font-family:var(--disp);font-weight:600;font-size:clamp(24px,3.4vw,32px);letter-spacing:-.02em;color:var(--ink-deep);margin:0;}
+  .sec-sub{color:var(--muted);max-width:60ch;margin:-18px 0 30px;font-size:15.5px;}
+
+  /* ---------- API CONSOLE (signature) ---------- */
+  .console{
+    background:var(--deep);border-radius:16px;overflow:hidden;
+    box-shadow:0 30px 70px -32px rgba(11,31,42,.55);border:1px solid #18323f;
+  }
+  .console-bar{
+    display:flex;align-items:center;gap:8px;padding:13px 18px;background:var(--deep-2);
+    border-bottom:1px solid #1c3947;
+  }
+  .dot{width:11px;height:11px;border-radius:50%;}
+  .dot.r{background:#ec6a5e;} .dot.y{background:#f4bf4f;} .dot.g{background:#61c554;}
+  .console-bar .label{font-family:var(--mono);font-size:12.5px;color:#7e98a5;margin-left:8px;}
+  .tabs{display:flex;gap:0;padding:0 18px;background:var(--deep-2);border-bottom:1px solid #1c3947;}
+  .tab{
+    font-family:var(--mono);font-size:13px;color:#7e98a5;background:none;border:none;cursor:pointer;
+    padding:13px 16px;border-bottom:2px solid transparent;transition:color .16s,border-color .16s;
+  }
+  .tab:hover{color:#cfe0e8;}
+  .tab.active{color:#fff;border-bottom-color:var(--accent);}
+
+  .req{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:18px;border-bottom:1px solid #16313e;}
+  .method{font-family:var(--mono);font-weight:700;font-size:12px;color:var(--deep);background:var(--signal);padding:5px 9px;border-radius:5px;letter-spacing:.04em;}
+  .url{font-family:var(--mono);font-size:13px;color:#9fd9cb;word-break:break-all;flex:1;min-width:180px;}
+  .url input{
+    font-family:var(--mono);font-size:13px;color:#fff;background:#0a2733;border:1px solid #1c3947;
+    border-radius:6px;padding:6px 9px;width:150px;outline:none;
+  }
+  .url input:focus{border-color:var(--accent);}
+  .run{
+    font-family:var(--mono);font-size:13px;font-weight:500;color:var(--deep);background:var(--accent);
+    border:none;border-radius:8px;padding:10px 18px;cursor:pointer;transition:filter .16s,transform .16s;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .run:hover{filter:brightness(1.08);transform:translateY(-1px);}
+  .run:disabled{opacity:.55;cursor:wait;transform:none;}
+
+  .status-row{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid #16313e;flex-wrap:wrap;min-height:52px;}
+  .pill{font-family:var(--mono);font-size:12.5px;font-weight:500;padding:5px 12px;border-radius:999px;display:inline-flex;align-items:center;gap:7px;}
+  .pill.ok{background:rgba(31,201,160,.13);color:var(--accent);border:1px solid rgba(31,201,160,.32);}
+  .pill.err{background:rgba(229,100,91,.13);color:var(--danger);border:1px solid rgba(229,100,91,.32);}
+  .pill.idle{background:#0e2733;color:#6d8794;border:1px solid #1c3947;}
+  .pill .led{width:7px;height:7px;border-radius:50%;background:currentColor;}
+  .metric{font-family:var(--mono);font-size:12.5px;color:#7e98a5;}
+  .metric b{color:#cfe0e8;font-weight:500;}
+
+  .resp{padding:18px;min-height:120px;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+  .rcard{background:#0d2632;border:1px solid #18323f;border-radius:10px;padding:14px;transition:border-color .16s,transform .16s;}
+  .rcard:hover{border-color:var(--accent-dim);transform:translateY(-2px);}
+  .rcard h4{font-family:var(--mono);font-size:14px;color:#fff;margin:0 0 6px;word-break:break-word;}
+  .rcard p{font-size:13px;color:#9bb2bd;margin:0 0 10px;line-height:1.5;}
+  .rcard .tags{display:flex;flex-wrap:wrap;gap:6px;}
+  .rtag{font-family:var(--mono);font-size:11px;color:#8fd6c5;background:rgba(31,201,160,.1);border:1px solid rgba(31,201,160,.22);border-radius:5px;padding:3px 7px;}
+  .rtag.muted{color:#7e98a5;background:#0a2027;border-color:#1c3947;}
+
+  .fx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+  .fx{background:#0d2632;border:1px solid #18323f;border-radius:10px;padding:16px;}
+  .fx .pair{font-family:var(--mono);font-size:12px;color:#7e98a5;margin-bottom:4px;}
+  .fx .val{font-family:var(--mono);font-size:24px;color:#fff;font-weight:500;letter-spacing:-.02em;}
+  .fx .ccy{font-size:13px;color:#9bb2bd;margin-top:4px;}
+
+  .console-msg{font-family:var(--mono);font-size:13px;color:#7e98a5;padding:8px 0;}
+  .console-msg.error{color:var(--danger);}
+  .raw-toggle{font-family:var(--mono);font-size:12px;color:#6d8794;background:none;border:none;cursor:pointer;padding:14px 18px 0;text-decoration:underline;text-underline-offset:3px;}
+  .raw-toggle:hover{color:#9fd9cb;}
+  pre.raw{
+    margin:10px 18px 18px;background:#081a22;border:1px solid #16313e;border-radius:8px;
+    padding:14px;overflow:auto;max-height:260px;font-family:var(--mono);font-size:12px;color:#86c9b8;line-height:1.6;
+  }
+  .skeleton{height:78px;border-radius:10px;background:linear-gradient(100deg,#0d2632 30%,#143241 50%,#0d2632 70%);background-size:200% 100%;animation:shimmer 1.3s linear infinite;}
+  @keyframes shimmer{to{background-position:-200% 0;}}
+
+  .console-note{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:14px;text-align:center;}
+
+  /* ---------- about ---------- */
+  .about-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:48px;align-items:start;}
+  .about-grid p{font-size:16.5px;color:#33474f;margin:0 0 16px;}
+  .about-grid p b{color:var(--ink);}
+  .facts{background:var(--surface);border:1px solid var(--wire);border-radius:14px;padding:8px 22px;}
+  .fact{display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--wire);}
+  .fact:last-child{border-bottom:none;}
+  .fact .k{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .fact .v{font-size:14px;font-weight:500;color:var(--ink-deep);text-align:right;}
+  @media(max-width:760px){.about-grid{grid-template-columns:1fr;gap:30px;}}
+
+  /* ---------- experience timeline ---------- */
+  .tl{position:relative;padding-left:30px;}
+  .tl::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--wire);}
+  .job{position:relative;padding-bottom:38px;}
+  .job:last-child{padding-bottom:0;}
+  .job::before{content:"";position:absolute;left:-30px;top:5px;width:16px;height:16px;border-radius:50%;background:var(--surface);border:3px solid var(--ink);}
+  .job.now::before{border-color:var(--accent);background:var(--accent);box-shadow:0 0 0 4px rgba(31,201,160,.2);}
+  .job-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:6px;}
+  .job-role{font-family:var(--disp);font-weight:600;font-size:18.5px;color:var(--ink-deep);}
+  .job-co{font-family:var(--mono);font-size:13px;color:var(--ink);}
+  .job-dur{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:auto;}
+  .tag-now{font-family:var(--mono);font-size:11px;color:var(--accent-dim);border:1px solid var(--accent);border-radius:999px;padding:2px 9px;}
+  .job ul{margin:10px 0 0;padding:0;list-style:none;}
+  .job li{position:relative;padding-left:18px;font-size:15px;color:#41555d;margin-bottom:7px;}
+  .job li::before{content:"›";position:absolute;left:0;color:var(--accent-dim);font-weight:700;}
+  .job li b{color:var(--ink);font-weight:600;}
+
+  /* ---------- skills ---------- */
+  .skill-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+  .skill-card{background:var(--surface);border:1px solid var(--wire);border-radius:14px;padding:22px;transition:transform .18s,box-shadow .18s;}
+  .skill-card:hover{transform:translateY(-3px);box-shadow:0 16px 36px -22px rgba(15,71,97,.4);}
+  .skill-card h3{font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-dim);margin:0 0 14px;}
+  .skill-card .items{display:flex;flex-wrap:wrap;gap:8px;}
+  .skill-card .items span{font-size:13.5px;color:var(--ink-deep);background:var(--paper);border:1px solid var(--wire);border-radius:7px;padding:6px 11px;font-weight:500;}
+
+  /* ---------- credentials ---------- */
+  .cred-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  .cred-box{background:var(--surface);border:1px solid var(--wire);border-radius:14px;padding:24px;}
+  .cred-box h3{font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-dim);margin:0 0 16px;}
+  .cred-box ul{margin:0;padding:0;list-style:none;}
+  .cred-box li{font-size:15px;color:var(--ink-deep);padding:9px 0;border-bottom:1px solid var(--wire);display:flex;justify-content:space-between;gap:12px;}
+  .cred-box li:last-child{border-bottom:none;}
+  .cred-box li .yr{font-family:var(--mono);font-size:12px;color:var(--muted);}
+  .lang-bar{height:6px;border-radius:3px;background:var(--paper);overflow:hidden;margin-top:5px;}
+  .lang-bar i{display:block;height:100%;background:var(--ink);border-radius:3px;}
+  @media(max-width:680px){.cred-grid{grid-template-columns:1fr;}}
+
+  /* ---------- contact / footer ---------- */
+  .contact{background:var(--ink-deep);color:#dCe7ec;border-radius:18px;padding:48px;text-align:center;}
+  .contact h2{font-family:var(--disp);font-weight:700;font-size:clamp(26px,4vw,38px);color:#fff;margin:0 0 14px;letter-spacing:-.02em;}
+  .contact p{color:#9fb8c2;max-width:50ch;margin:0 auto 26px;}
+  .contact .cta-row{justify-content:center;}
+  .contact .btn-primary{background:var(--accent);color:var(--deep);}
+  .contact .btn-primary:hover{box-shadow:0 12px 30px -12px var(--accent);}
+  .contact .btn-ghost{background:transparent;border-color:#2c4d5c;color:#cfe0e8;}
+  .contact .btn-ghost:hover{border-color:var(--accent);}
+  footer{text-align:center;padding:34px 0 50px;color:var(--muted);font-family:var(--mono);font-size:12.5px;}
+  footer a{color:var(--ink);text-decoration:underline;text-underline-offset:3px;}
+
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
+  .reveal.in{opacity:1;transform:none;}
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto;}
+    .reveal{opacity:1;transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a href="#top" class="brand">emzuniga<span>.dev</span></a>
+    <div class="nav-links">
+      <a href="#demo">Live demo</a>
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#skills">Skills</a>
+      <a href="CV_Emmanuel_Zuniga.docx" class="nav-cv" download>Download CV ↓</a>
+    </div>
+  </div>
+</nav>
+
+<a id="top"></a>
+<header>
+  <div class="wrap">
+    <div class="eyebrow reveal">Integrations &amp; Cloud Engineer · Costa Rica</div>
+    <h1 class="reveal">I connect systems and ship software that <em>just works</em>.</h1>
+    <p class="lede reveal">I'm <b>Emmanuel Zúñiga</b> — a cloud identity support engineer with 3+ years integrating <b>REST APIs and web services</b> into real client systems, and resolving the complex incidents that come after. The console below isn't a screenshot — it makes live API calls right now.</p>
+    <div class="cta-row reveal">
+      <a href="#demo" class="btn btn-primary">▸ Run the live API demo</a>
+      <a href="mailto:emzuka23@gmail.com" class="btn btn-ghost">Get in touch</a>
+    </div>
+    <div class="meta-chips reveal">
+      <span class="chip"><b>3+ yrs</b> API integration</span>
+      <span class="chip"><b>4 yrs</b> Azure / identity support</span>
+      <span class="chip"><b>OCI</b> Multicloud Architect</span>
+      <span class="chip">EN · ES bilingual</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ SIGNATURE: LIVE API CONSOLE ============ -->
+<section id="demo">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">01</span>
+      <h2 class="sec-title">Live API integration console</h2>
+    </div>
+    <p class="sec-sub reveal">Pick an endpoint and run it. Each request is made from your browser to a real public REST API — you'll see the method, URL, HTTP status, latency, parsed results, and the raw JSON payload. This is the same integration workflow I apply to payment, shipping, and identity APIs.</p>
+
+    <div class="console reveal">
+      <div class="console-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="label">integration-console — fetch()</span>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="github">GitHub repositories</button>
+        <button class="tab" data-tab="fx">Live exchange rates</button>
+      </div>
+
+      <!-- request line -->
+      <div class="req">
+        <span class="method">GET</span>
+        <span class="url" id="urlLine"></span>
+        <button class="run" id="runBtn">▸ Send request</button>
+      </div>
+
+      <!-- status -->
+      <div class="status-row">
+        <span class="pill idle" id="statusPill"><span class="led"></span>Idle</span>
+        <span class="metric" id="latency"></span>
+        <span class="metric" id="count"></span>
+      </div>
+
+      <!-- response -->
+      <div class="resp" id="resp">
+        <div class="console-msg">Press <b style="color:#cfe0e8">Send request</b> to call the endpoint.</div>
+      </div>
+
+      <button class="raw-toggle" id="rawToggle" style="display:none">▾ Show raw JSON response</button>
+      <pre class="raw" id="rawBox" style="display:none"></pre>
+    </div>
+    <p class="console-note">Built with vanilla JavaScript · async/await · AbortController timeout · graceful error handling — no frameworks, no API keys.</p>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="about">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">02</span>
+      <h2 class="sec-title">About</h2>
+    </div>
+    <div class="about-grid reveal">
+      <div>
+        <p>I started in customer service and team leadership, moved into enterprise <b>Azure identity support</b>, and along the way built and integrated websites for local stores and small businesses. That mix is the point: I'm equally comfortable in a <b>Salesforce ticket queue talking to a customer</b> and in the code that connects their systems together.</p>
+        <p>My day-to-day is <b>root-cause analysis under pressure</b> — diagnosing why a sync broke, why an API call returns a 4xx, why an integration that worked yesterday doesn't today — then fixing it and explaining it in plain language to the people affected.</p>
+        <p>I'm certified across <b>Oracle Cloud Infrastructure</b> and <b>AWS</b>, scripting-fluent in PowerShell, and hands-on with REST APIs in JavaScript, PHP, and SQL.</p>
+      </div>
+      <div class="facts">
+        <div class="fact"><span class="k">Based in</span><span class="v">Alajuela, Costa Rica</span></div>
+        <div class="fact"><span class="k">Focus</span><span class="v">API &amp; system integrations</span></div>
+        <div class="fact"><span class="k">Cloud</span><span class="v">Azure · OCI · AWS</span></div>
+        <div class="fact"><span class="k">Languages</span><span class="v">English · Spanish</span></div>
+        <div class="fact"><span class="k">Open to</span><span class="v">Remote / hybrid roles</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXPERIENCE ============ -->
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">03</span>
+      <h2 class="sec-title">Experience</h2>
+    </div>
+    <div class="tl reveal">
+
+      <div class="job now">
+        <div class="job-top">
+          <span class="job-role">Freelance Web Developer &amp; Integrations Specialist</span>
+          <span class="job-co">Independent / Self-Employed</span>
+          <span class="tag-now">Current</span>
+          <span class="job-dur">3 years</span>
+        </div>
+        <ul>
+          <li>Designed, built, and deployed custom websites and e-commerce stores for local retailers, owning each project from <b>requirements gathering</b> through launch and ongoing support.</li>
+          <li>Integrated third-party <b>REST APIs and web services</b> — payment gateways (Stripe, PayPal), shipping providers, and booking platforms — to automate orders and operations.</li>
+          <li>Developed front-end and back-end functionality in <b>JavaScript, PHP, and SQL</b>, resolving integration and performance issues in live production.</li>
+          <li>Acted as the primary technical contact for non-technical clients, providing <b>ongoing support</b> and prioritizing incidents by business impact.</li>
+        </ul>
+      </div>
+
+      <div class="job">
+        <div class="job-top">
+          <span class="job-role">Azure Identity Support Engineer</span>
+          <span class="job-co">Tel Experts</span>
+          <span class="job-dur">4 years</span>
+        </div>
+        <ul>
+          <li>Provided remote technical support to <b>Microsoft enterprise customers</b>, specializing in cloud identity.</li>
+          <li>Resolved complex incidents across <b>Azure Active Directory</b> — RBAC, B2C, B2B, Domain Services, Managed Identities.</li>
+          <li>Administered directory synchronization via <b>Microsoft AD Connect</b> and automated tasks with <b>PowerShell</b>.</li>
+          <li>Collaborated with cross-functional teams to resolve critical incidents in hybrid cloud / on-prem environments.</li>
+        </ul>
+      </div>
+
+      <div class="job">
+        <div class="job-top">
+          <span class="job-role">Customer Service &amp; Team Leader</span>
+          <span class="job-co">Sykes</span>
+          <span class="job-dur">4 years</span>
+        </div>
+        <ul>
+          <li><b>Team Manager Backup:</b> led operational teams on second-level resolutions, ensuring KPI compliance.</li>
+          <li><b>Floor Support:</b> real-time escalation point and mentor for agents, improving response times and accuracy.</li>
+          <li><b>Customer Service Agent:</b> managed international customers, building assertive communication and conflict resolution.</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ SKILLS ============ -->
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">04</span>
+      <h2 class="sec-title">Technical skills</h2>
+    </div>
+    <div class="skill-grid reveal">
+      <div class="skill-card">
+        <h3>APIs &amp; Integrations</h3>
+        <div class="items"><span>REST</span><span>Web services</span><span>JSON</span><span>Payment gateways</span><span>Webhooks</span><span>Async / fetch</span></div>
+      </div>
+      <div class="skill-card">
+        <h3>Languages &amp; Scripting</h3>
+        <div class="items"><span>JavaScript</span><span>PHP</span><span>SQL</span><span>PowerShell</span><span>HTML / CSS</span></div>
+      </div>
+      <div class="skill-card">
+        <h3>Cloud &amp; Infrastructure</h3>
+        <div class="items"><span>Microsoft Azure</span><span>Oracle Cloud (OCI)</span><span>AWS</span><span>SaaS environments</span></div>
+      </div>
+      <div class="skill-card">
+        <h3>Identity &amp; Access</h3>
+        <div class="items"><span>Azure AD</span><span>RBAC</span><span>B2C / B2B</span><span>AD Connect</span><span>Office 365</span></div>
+      </div>
+      <div class="skill-card">
+        <h3>Support &amp; Delivery</h3>
+        <div class="items"><span>Incident response</span><span>Root-cause analysis</span><span>Salesforce tickets</span><span>Client onboarding</span></div>
+      </div>
+      <div class="skill-card">
+        <h3>Web &amp; Platforms</h3>
+        <div class="items"><span>WordPress</span><span>E-commerce</span><span>Cloud hosting</span><span>Responsive design</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CREDENTIALS ============ -->
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">05</span>
+      <h2 class="sec-title">Certifications &amp; languages</h2>
+    </div>
+    <div class="cred-grid reveal">
+      <div class="cred-box">
+        <h3>Certifications</h3>
+        <ul>
+          <li><span>OCI 2025 Multicloud Architect Professional</span><span class="yr">2025</span></li>
+          <li><span>AWS Cloud Practitioner Essentials</span><span class="yr">2025</span></li>
+          <li><span>Cisco Systems Course</span><span class="yr">2016</span></li>
+        </ul>
+      </div>
+      <div class="cred-box">
+        <h3>Languages</h3>
+        <ul>
+          <li style="display:block;border-bottom:1px solid var(--wire)">
+            <div style="display:flex;justify-content:space-between"><span>Spanish</span><span class="yr">Native</span></div>
+            <div class="lang-bar"><i style="width:100%"></i></div>
+          </li>
+          <li style="display:block;border-bottom:none">
+            <div style="display:flex;justify-content:space-between"><span>English</span><span class="yr">Professional</span></div>
+            <div class="lang-bar"><i style="width:85%"></i></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section>
+  <div class="wrap">
+    <div class="contact reveal">
+      <h2>Let's build the integration.</h2>
+      <p>Open to Integrations Engineer and technical consulting roles — remote or hybrid. The fastest way to reach me is email.</p>
+      <div class="cta-row">
+        <a href="mailto:emzuka23@gmail.com" class="btn btn-primary">emzuka23@gmail.com</a>
+        <a href="https://github.com/emzuka-cloud" target="_blank" rel="noopener" class="btn btn-ghost">GitHub ↗</a>
+        <a href="tel:+50689981308" class="btn btn-ghost">(+506) 8998-1308</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Emmanuel Zúñiga Castro · Alajuela, Costa Rica · Built with vanilla HTML/CSS/JS · <a href="https://github.com/emzuka-cloud" target="_blank" rel="noopener">github.com/emzuka-cloud</a>
+  </div>
+</footer>
+
+<script>
+/* ---------- API Integration Console ----------
+   Two live, key-free, CORS-enabled REST endpoints.
+   Demonstrates: fetch + async/await, request timeout via AbortController,
+   HTTP status handling, latency measurement, JSON parsing, DOM rendering,
+   and graceful error states. */
+
+const endpoints = {
+  github: {
+    label: "GitHub repositories",
+    base: "https://api.github.com/users/",
+    build: (u) => `https://api.github.com/users/${encodeURIComponent(u)}/repos?sort=updated&per_page=6`,
+    editable: true,
+    defaultUser: "emzuka-cloud"
+  },
+  fx: {
+    label: "Live exchange rates",
+    url: "https://open.er-api.com/v6/latest/USD",
+    editable: false
+  }
+};
+
+let activeTab = "github";
+let githubUser = endpoints.github.defaultUser;
+let lastRaw = null;
+
+const $ = (id) => document.getElementById(id);
+const urlLine = $("urlLine");
+const runBtn = $("runBtn");
+const statusPill = $("statusPill");
+const latency = $("latency");
+const countEl = $("count");
+const resp = $("resp");
+const rawToggle = $("rawToggle");
+const rawBox = $("rawBox");
+
+function currentUrl(){
+  return activeTab === "github" ? endpoints.github.build(githubUser) : endpoints.fx.url;
+}
+
+function renderUrlLine(){
+  if(activeTab === "github"){
+    urlLine.innerHTML =
+      `${endpoints.github.base}<input id="ghUser" value="${githubUser}" spellcheck="false" aria-label="GitHub username"/>/repos`;
+    const inp = $("ghUser");
+    inp.addEventListener("input", e => { githubUser = e.target.value.trim() || endpoints.github.defaultUser; });
+    inp.addEventListener("keydown", e => { if(e.key === "Enter") sendRequest(); });
+  } else {
+    urlLine.textContent = endpoints.fx.url;
+  }
+}
+
+function setStatus(kind, text){
+  statusPill.className = "pill " + kind;
+  statusPill.innerHTML = `<span class="led"></span>${text}`;
+}
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelector(".tab.active").classList.remove("active");
+    tab.classList.add("active");
+    activeTab = tab.dataset.tab;
+    renderUrlLine();
+    resp.innerHTML = `<div class="console-msg">Endpoint switched to <b style="color:#cfe0e8">${endpoints[activeTab].label}</b>. Press Send request.</div>`;
+    setStatus("idle","Idle"); latency.textContent=""; countEl.textContent="";
+    rawToggle.style.display="none"; rawBox.style.display="none";
+  });
+});
+
+async function callApi(url){
+  const t0 = performance.now();
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  try {
+    const res = await fetch(url, { signal: ctrl.signal, headers: { "Accept":"application/json" } });
+    const ms = Math.round(performance.now() - t0);
+    let data = null;
+    try { data = await res.json(); } catch(_) {}
+    return { ok: res.ok, status: res.status, statusText: res.statusText, ms, data };
+  } catch(err){
+    const ms = Math.round(performance.now() - t0);
+    const reason = err.name === "AbortError" ? "Request timed out (8s)" : "Network / CORS error";
+    return { ok:false, status:0, statusText:reason, ms, data:null };
+  } finally { clearTimeout(timer); }
+}
+
+function showSkeletons(){
+  resp.innerHTML = `<div class="cards">${'<div class="skeleton"></div>'.repeat(6)}</div>`;
+}
+
+function renderGithub(repos){
+  if(!Array.isArray(repos) || repos.length === 0){
+    resp.innerHTML = `<div class="console-msg">No public repositories returned for <b style="color:#cfe0e8">${githubUser}</b>. Try another username in the URL field above.</div>`;
+    countEl.textContent = "0 items";
+    return;
+  }
+  countEl.textContent = `${repos.length} repos`;
+  resp.innerHTML = `<div class="cards">` + repos.map(r => `
+    <a class="rcard" href="${r.html_url}" target="_blank" rel="noopener" style="display:block">
+      <h4>${r.name}</h4>
+      <p>${r.description ? escapeHtml(r.description) : "No description provided."}</p>
+      <div class="tags">
+        <span class="rtag">${r.language || "—"}</span>
+        <span class="rtag muted">★ ${r.stargazers_count}</span>
+        <span class="rtag muted">⑂ ${r.forks_count}</span>
+      </div>
+    </a>`).join("") + `</div>`;
+}
+
+function renderFx(data){
+  if(!data || !data.rates){
+    resp.innerHTML = `<div class="console-msg error">Unexpected payload shape — no "rates" field found.</div>`;
+    return;
+  }
+  const picks = [
+    ["CRC","Costa Rican colón"],["EUR","Euro"],["GBP","British pound"],
+    ["MXN","Mexican peso"],["BRL","Brazilian real"],["CAD","Canadian dollar"]
+  ];
+  countEl.textContent = `base ${data.base_code || "USD"}`;
+  resp.innerHTML = `<div class="fx-grid">` + picks.map(([code,name]) => `
+    <div class="fx">
+      <div class="pair">USD → ${code}</div>
+      <div class="val">${data.rates[code] ? Number(data.rates[code]).toLocaleString(undefined,{maximumFractionDigits:2}) : "—"}</div>
+      <div class="ccy">${name}</div>
+    </div>`).join("") + `</div>`;
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+async function sendRequest(){
+  runBtn.disabled = true;
+  runBtn.textContent = "⋯ Sending";
+  setStatus("idle","Requesting…"); latency.textContent=""; countEl.textContent="";
+  rawToggle.style.display="none"; rawBox.style.display="none"; rawBox.textContent="";
+  showSkeletons();
+
+  const url = currentUrl();
+  const r = await callApi(url);
+  lastRaw = r.data;
+
+  latency.innerHTML = `latency <b>${r.ms} ms</b>`;
+
+  if(r.ok){
+    setStatus("ok", `${r.status} ${r.statusText || "OK"}`);
+    if(activeTab === "github") renderGithub(r.data);
+    else renderFx(r.data);
+    if(lastRaw){
+      rawToggle.style.display = "block";
+      rawBox.textContent = JSON.stringify(lastRaw, null, 2);
+    }
+  } else {
+    setStatus("err", r.status ? `${r.status} ${r.statusText}` : r.statusText);
+    resp.innerHTML = `<div class="console-msg error">⚠ Request failed: ${r.statusText}.
+      ${r.status === 403 ? "GitHub's public rate limit (60/hour) may be reached — try again later." : "The endpoint may be temporarily unavailable. Try again."}</div>`;
+    if(lastRaw){
+      rawToggle.style.display = "block";
+      rawBox.textContent = JSON.stringify(lastRaw, null, 2);
+    }
+  }
+
+  runBtn.disabled = false;
+  runBtn.innerHTML = "▸ Send request";
+}
+
+runBtn.addEventListener("click", sendRequest);
+
+rawToggle.addEventListener("click", () => {
+  const open = rawBox.style.display === "block";
+  rawBox.style.display = open ? "none" : "block";
+  rawToggle.textContent = (open ? "▾ Show" : "▴ Hide") + " raw JSON response";
+});
+
+renderUrlLine();
+
+/* ---------- scroll reveal ---------- */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+</script>
+</body>
+</html>
