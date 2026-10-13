@@ -206,7 +206,7 @@ a:hover { text-decoration-color: var(--ink); }
 .credits {
     grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     border-top: 1px solid var(--hairline);
     border-bottom: 1px solid var(--hairline);
     font-style: normal;
@@ -296,6 +296,102 @@ p { color: var(--ink-2); }
 }
 .colophon .credits { grid-template-columns: 1fr 1fr 2fr; }
 
+/* ---------- Deck: pinned split stage, pill rail in sync with a stack of plates ----------
+   Off (mobile, short screens, print, no JS): wrappers vanish and sections read as rows.
+   On (script.js adds html.deck-on): --p is scroll progress in sections, --d each plate's distance from it. */
+.deck, .stage, .cards { display: contents; }
+.rail, .count, .snap { display: none; }
+
+@media screen {
+    html.deck-on { scroll-snap-type: y proximity; }
+
+    .deck-on .deck {
+        display: block; position: relative;
+        height: var(--h);
+        margin-top: clamp(56px, 9vh, 104px);
+    }
+    .deck-on .snap { display: block; position: absolute; left: 0; width: 1px; height: 1px; scroll-snap-align: start; }
+
+    .deck-on .stage {
+        display: grid; grid-template-columns: minmax(220px, 3fr) 9fr;
+        position: sticky; top: var(--bar-h);
+        height: calc(100vh - var(--bar-h));
+        overflow: clip;
+        border-bottom: 1px solid var(--hairline);
+    }
+
+    /* Rail: the active pill always sits in the slot at mid-height */
+    .deck-on .rail {
+        display: block; position: relative;
+        border-right: 1px solid var(--hairline);
+        -webkit-mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent);
+        mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent);
+    }
+    .pills {
+        --pitch: 44px;
+        position: absolute; top: 50%; left: 0; right: 0;
+        margin-top: -16px;
+        padding: 0 var(--gutter) 0 0;
+        list-style: none;
+        transform: translateY(calc(var(--p, 0) * var(--pitch) * -1));
+    }
+    .pills li { height: 32px; margin-bottom: 12px; }
+    .pills a {
+        display: inline-flex; align-items: center; gap: 12px; height: 100%;
+        padding: 0 14px;
+        font: 400 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase;
+        color: var(--ink-2); text-decoration: none;
+        border: 1px solid var(--hairline);
+        background: color-mix(in srgb, var(--ground) 70%, transparent);
+        backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+        transition: background-color .1s ease, color .1s ease, border-color .1s ease;
+    }
+    .pills a span { opacity: .6; }
+    .pills a:hover { color: var(--ink); border-color: var(--ink); }
+    .pills [aria-current="true"] { background: var(--ink); border-color: var(--ink); color: var(--ground); }
+
+    /* Plates: upcoming ones stack behind to the right, the passed one slides off left and fades */
+    .deck-on .cards { display: block; position: relative; counter-reset: plate; }
+    .deck-on .sheet {
+        --a: clamp(-1, var(--d, 0), 0);
+        --b: clamp(0, var(--d, 0), 3);
+        position: absolute;
+        inset: clamp(32px, 5vh, 64px) clamp(72px, 9vw, 140px) clamp(48px, 7vh, 80px) clamp(32px, 4vw, 64px);
+        display: flex; flex-direction: column;
+        padding: 28px clamp(24px, 3vw, 44px);
+        overflow: auto; overscroll-behavior: auto;
+        background: var(--ground);
+        border: 1px solid var(--hairline);
+        counter-increment: plate;
+        transform-origin: 50% 0;
+        transform:
+            translate(calc(var(--a) * 70% + var(--b) * 28px), calc(var(--b) * -16px))
+            rotate(calc(var(--a) * 4deg))
+            scale(calc(1 - var(--b) * .05));
+        opacity: min(calc(1 + var(--a) * 1.2), calc(3 - var(--b)));
+        will-change: transform, opacity;
+        scrollbar-width: thin;
+    }
+    /* ink drains from plates waiting in the stack */
+    .deck-on .sheet > *, .deck-on .sheet::before { opacity: calc(1 - clamp(0, var(--d, 0), 1) * .92); }
+    .deck-on .sheet > .label { padding: 0 0 22px; }
+    .deck-on .sheet > .label::before { content: counter(plate, decimal-leading-zero) " \2014  "; color: var(--ink); }
+    .deck-on .sheet > .col { max-width: none; }
+    /* Experience dissolves so each job stands as its own sheet under the section's name */
+    .deck-on #experience, .deck-on #experience > .col { display: contents; }
+    .deck-on #experience > .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } /* kept for screen readers */
+    .deck-on .job + .job { margin: 0; }
+    .deck-on .job::before {
+        content: counter(plate, decimal-leading-zero) " \2014  Professional Experience";
+        display: block; padding: 0 0 22px;
+        font: 400 11px/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink);
+    }
+
+    .deck-on .count {
+        display: block; position: absolute; left: clamp(32px, 4vw, 64px); bottom: 16px;
+    }
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 900px) {
     .bar-links { display: none; }
@@ -308,7 +404,7 @@ p { color: var(--ink-2); }
     .row > .col { grid-column: 1 / -1; }
     .job-head h3 { font-size: 1.25rem; }
     .credits { grid-template-columns: 1fr 1fr; }
-    .credit:nth-child(3) { border-left: 0; padding-left: 0; }
+    .credit:nth-child(odd) { border-left: 0; padding-left: 0; }
     .credit:nth-child(n+3) { border-top: 1px solid var(--hairline); }
     .colophon .credits { grid-template-columns: 1fr 1fr; }
     .colophon .credit:nth-child(3) { grid-column: 1 / -1; }
@@ -360,9 +456,9 @@ p { color: var(--ink-2); }
         font: 400 8pt/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2);
     }
     .row > .col { grid-column: 4 / -1; max-width: none; }
-    .credits { grid-template-columns: repeat(4, 1fr); }
+    .credits { grid-template-columns: repeat(5, 1fr); }
     .credit:nth-child(n) { border-top: 0; }
-    .credit:nth-child(3) { border-left: 1px solid var(--hairline); padding-left: 8pt; }
+    .credit:nth-child(n+2) { border-left: 1px solid var(--hairline); padding-left: 8pt; }
     .stints > div, .specs > div { grid-template-columns: 11rem 1fr; }
     .ledger li { grid-template-columns: 3rem 1fr; }
     .yr { line-height: 1.45; font-size: 9pt; }

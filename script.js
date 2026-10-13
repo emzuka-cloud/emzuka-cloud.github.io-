@@ -1,21 +1,98 @@
 // Print / PDF button
 document.querySelector('[data-print]').addEventListener('click', () => window.print());
 
-// Mark the section in view in the token bar
-const links = new Map(
-    [...document.querySelectorAll('.bar-links a')].map(a => [a.hash.slice(1), a])
-);
-const spy = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-        const link = links.get(e.target.id);
-        if (!link) return;
-        if (e.isIntersecting) {
-            links.forEach(a => a.removeAttribute('aria-current'));
-            link.setAttribute('aria-current', 'true');
+// Deck: on wide screens the sections pin into a split stage; scroll advances
+// the pill rail and the plate stack in sync. Also marks the section in view in the token bar.
+(() => {
+    const root = document.documentElement;
+    const deck = document.querySelector('.deck');
+    const cards = deck.querySelector('.cards');
+    // each job is its own plate; Experience holds too much for one
+    const plates = [...cards.querySelectorAll('.cards > .row:not(#experience), #experience .job')];
+    plates.forEach(s => s.classList.add('sheet'));
+    const n = plates.length;
+    const wide = matchMedia('screen and (min-width: 1100px) and (min-height: 860px)');
+    const BAR = 56; // --bar-h
+    const barLinks = [...document.querySelectorAll('.bar-links a')];
+
+    const rail = document.createElement('div');
+    rail.className = 'rail';
+    rail.setAttribute('aria-hidden', 'true'); // ponytail: mirrors the token bar, which stays the real nav
+    rail.innerHTML = '<ol class="pills">' + plates.map((s, i) =>
+        `<li><a href="#${s.id}" tabindex="-1"><span>${String(i + 1).padStart(2, '0')}</span>${s.dataset.short}</a></li>`
+    ).join('') + '</ol>';
+    deck.querySelector('.stage').prepend(rail);
+    const pills = [...rail.querySelectorAll('a')];
+
+    const count = document.createElement('p');
+    count.className = 'count label';
+    count.setAttribute('aria-hidden', 'true');
+    cards.append(count);
+
+    const snaps = plates.map(() => deck.appendChild(Object.assign(document.createElement('div'), { className: 'snap' })));
+
+    let step = 0, cur = -1, queued = false;
+
+    const mark = i => {
+        if (i === cur) return;
+        cur = i;
+        const set = (a, yes) => yes ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current');
+        pills.forEach((a, k) => set(a, k === i));
+        barLinks.forEach(a => set(a, !!plates[i].closest(a.hash)));
+        count.textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
+        if (root.classList.contains('deck-on')) plates.forEach((s, k) => { s.inert = k !== i; });
+    };
+
+    const update = () => {
+        queued = false;
+        if (!root.classList.contains('deck-on')) {
+            // stacked rows: the last section whose top has passed 45% of the viewport
+            let i = 0;
+            plates.forEach((s, k) => { if (s.getBoundingClientRect().top < innerHeight * .45) i = k; });
+            return mark(i);
         }
+        let p = Math.min(n - 1, Math.max(0, (BAR - deck.getBoundingClientRect().top) / step));
+        // browser zoom leaves snapped scroll on fractional pixels (p = 1.0001); without this the
+        // resting plate counts as outgoing and drops under the next one
+        if (Math.abs(p - Math.round(p)) < .01) p = Math.round(p);
+        rail.style.setProperty('--p', p);
+        plates.forEach((s, k) => {
+            const d = k - p;
+            s.style.setProperty('--d', d);
+            s.style.zIndex = Math.round(d >= 0 ? 100 - d * 10 : 50 + d * 10); // outgoing plate slides under the incoming one
+        });
+        mark(Math.round(p));
+    };
+
+    const layout = () => {
+        const on = wide.matches;
+        root.classList.toggle('deck-on', on);
+        if (on) {
+            step = innerHeight * .8; // ponytail: scroll distance per plate, tune here
+            deck.style.setProperty('--h', `${innerHeight - BAR + (n - 1) * step}px`);
+            // snapped scrollY lands each plate exactly in place (offsets html's scroll-padding-top of bar + 24px)
+            snaps.forEach((el, k) => { el.style.top = `${k * step + 24}px`; });
+        } else {
+            plates.forEach(s => { s.inert = false; });
+        }
+        cur = -1;
+        update();
+    };
+
+    // in deck mode, section anchors jump to the plate's scroll position instead of the pinned element
+    document.addEventListener('click', e => {
+        const a = e.target.closest('.bar-links a, .pills a');
+        const i = a ? plates.findIndex(s => s.closest(a.hash)) : -1;
+        if (i < 0 || !root.classList.contains('deck-on')) return;
+        e.preventDefault();
+        scrollTo({ top: deck.getBoundingClientRect().top + scrollY - BAR + i * step });
     });
-}, { rootMargin: '-40% 0px -55% 0px' });
-links.forEach((_, id) => spy.observe(document.getElementById(id)));
+
+    addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
+    addEventListener('resize', layout);
+    wide.addEventListener('change', layout);
+    layout();
+})();
 
 // Halftone screen: dot size follows slow drifting "ink coverage" waves
 (() => {
